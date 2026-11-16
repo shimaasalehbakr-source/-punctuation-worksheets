@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Punctuation Worksheet</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#fff8e1;color:#333;text-align:center;-webkit-user-select:none;user-select:none}
+header{background:#1e88e5;color:#fff;padding:10px;font-size:22px;font-weight:bold}
+#bar{height:12px;background:#ffe0b2}#fill{height:100%;width:0;background:#43a047;transition:width .3s}
+#card{max-width:760px;margin:14px auto;background:#fff;border-radius:20px;padding:18px;box-shadow:0 4px 12px #0002;min-height:340px}
+h2{margin:4px 0 12px;font-size:24px;color:#e65100}
+.sent{font-size:34px;margin:14px 0;line-height:1.5}
+.pic{font-size:64px}
+.slot{display:inline-block;min-width:52px;height:52px;line-height:48px;border:3px dashed #1e88e5;border-radius:12px;vertical-align:middle;font-weight:bold;color:#d81b60}
+.slot.ok{border:3px solid #43a047;background:#e8f5e9}.slot.bad{border-color:#e53935;background:#ffebee}
+.mk,.opt,.it{display:inline-block;margin:6px;padding:8px 20px;font-size:40px;font-weight:bold;border-radius:14px;background:#ffcc80;border:3px solid #fb8c00;cursor:pointer;touch-action:none}
+.opt,.it{font-size:26px;touch-action:auto;background:#e1f5fe;border-color:#039be5}
+.sel{outline:5px solid #d81b60}.done{background:#c8e6c9!important;border-color:#43a047!important}
+.col{display:inline-block;vertical-align:top;width:48%}
+.shake{animation:sh .3s}@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+nav{max-width:760px;margin:0 auto 10px;display:flex;justify-content:space-between;padding:0 10px}
+button.nav{font-size:24px;padding:12px 26px;border:0;border-radius:14px;color:#fff;cursor:pointer}
+#back{background:#8e24aa}#next{background:#43a047}#erase{background:#e53935}
+#wow{position:fixed;inset:0;display:none;align-items:center;justify-content:center;font-size:56px;font-weight:bold;color:#d81b60;pointer-events:none;text-shadow:0 0 8px #fff}
+#ghost{position:fixed;display:none;pointer-events:none;z-index:9}
+footer{font-size:14px;color:#777;padding:6px}
+</style></head><body>
+<header>✏️ Punctuation Worksheet</header>
+<div id="bar"><div id="fill"></div></div>
+<div id="card"></div>
+<nav><button class="nav" id="back">⬅ Back</button><button class="nav" id="erase">🧽 Eraser</button><button class="nav" id="next">Next ➡</button></nav>
+<div id="wow"></div><div id="ghost" class="mk"></div>
+<footer>Full Inclusion Program 2026-2027</footer>
+<script>
+var P='.?!';
+var Q=[
+{t:'place',s:'I like apples',a:'.',p:'🍎'},
+{t:'place',s:'Do you like pizza',a:'?',p:'🍕'},
+{t:'place',s:'Wow, I won',a:'!',p:'🏆'},
+{t:'choose',s:'Where is my bag',a:'?',p:'🎒'},
+{t:'choose',s:'The cat is sleeping',a:'.',p:'🐱'},
+{t:'match',pairs:[['I am happy','.'],['Who is he','?'],['Hooray','!']]},
+{t:'place',s:'What is your name',a:'?',p:'🧒'},
+{t:'place',s:'Stop',a:'!',p:'🛑'},
+{t:'sent',opts:['Is it a dog?','Is it a dog.','Is it a dog!'],a:0,p:'🐶'},
+{t:'match',pairs:[['The sun is hot','.'],['Can I play','?'],['Look out','!']]},
+{t:'place',s:'Look at the rainbow',a:'!',p:'🌈'},
+{t:'place',s:'She plays with a ball',a:'.',p:'⚽'},
+{t:'choose',s:'Can I have some water',a:'?',p:'💧'},
+{t:'match',pairs:[['I see a bird','.'],['Where is the book','?'],['Help me','!'],['Are you ready','?']]},
+{t:'place',s:'Happy birthday',a:'!',p:'🎂'}
+];
+var i=0,score=0,solved={},card=document.getElementById('card'),sel=null,slotEl=null,cur=null;
+function $(id){return document.getElementById(id)}
+function wow(){var w=$('wow'),m=['Wow! Bravo! 🎉','Great job! ⭐','Super! 🌟','Excellent! 👏'];
+w.textContent=m[Math.floor(Math.random()*m.length)];w.style.display='flex';
+setTimeout(function(){w.style.display='none'},900)}
+function good(){if(!solved[i]){solved[i]=1;score++}wow()}
+function bad(el){el.className+=' shake';setTimeout(function(){el.className=el.className.replace(' shake','')},350)}
+function show(){
+ var q=Q[i];sel=null;$('fill').style.width=(i/15*100)+'%';
+ if(i>=15){card.innerHTML='<h2>🎉 Well done!</h2><div class="pic">🏅</div><div class="sent">Score: '+score+' / 15</div><button class="nav" id="again" style="background:#fb8c00">Play again</button>';
+  $('again').onclick=function(){i=0;score=0;solved={};show()};$('fill').style.width='100%';return}
+ var h='<h2>Question '+(i+1)+' of 15</h2>';
+ if(q.t=='place'){h+='<div class="pic">'+q.p+'</div><div class="sent">Add the mark: drag it or tap it.</div><div class="sent">'+q.s+' <span class="slot" id="slot"></span></div><div id="tray">'+mk()+'</div>'}
+ if(q.t=='choose'){h+='<div class="pic">'+q.p+'</div><div class="sent">Choose the correct mark.</div><div class="sent">'+q.s+' <span class="slot" id="slot"></span></div><div>'+P.split('').map(function(c){return '<span class="opt" style="font-size:40px" data-c="'+c+'">'+c+'</span>'}).join('')+'</div>'}
+ if(q.t=='sent'){h+='<div class="pic">'+q.p+'</div><div class="sent">Choose the correct sentence.</div>'+q.opts.map(function(o,k){return '<div><span class="opt" data-k="'+k+'">'+o+'</span></div>'}).join('')}
+ if(q.t=='match'){var L=q.pairs,R=shuf(L.map(function(p,k){return k}));
+  h+='<div class="sent" style="font-size:24px">Tap a sentence, then tap its mark.</div><div class="col">'+L.map(function(p,k){return '<div><span class="it" data-l="'+k+'">'+p[0]+'</span></div>'}).join('')+'</div><div class="col">'+R.map(function(k){return '<div><span class="mk" style="touch-action:auto" data-r="'+k+'" data-c="'+L[k][1]+'">'+L[k][1]+'</span></div>'}).join('')+'</div>'}
+ card.innerHTML=h;wire(q);
+}
+function mk(){return P.split('').map(function(c){return '<span class="mk" data-c="'+c+'">'+c+'</span>'}).join('')}
+function shuf(a){return a.sort(function(){return Math.random()-.5})}
+function put(c){var s=$('slot'),q=Q[i];if(!s)return;s.textContent=c;
+ if(c==q.a){s.className='slot ok';good()}else{s.className='slot bad';bad(s)}}
+function wire(q){
+ var ms=card.querySelectorAll('.mk[data-c]'),k;
+ if(q.t=='place'){for(k=0;k<ms.length;k++)drag(ms[k])}
+ if(q.t=='choose'){var os=card.querySelectorAll('.opt');for(k=0;k<os.length;k++)os[k].onclick=function(){put(this.getAttribute('data-c'))}}
+ if(q.t=='sent'){var o2=card.querySelectorAll('.opt');for(k=0;k<o2.length;k++)o2[k].onclick=function(){
+  if(+this.getAttribute('data-k')==q.a){this.className+=' done';good()}else bad(this)}}
+ if(q.t=='match'){var ls=card.querySelectorAll('.it'),rs=card.querySelectorAll('.mk');
+  for(k=0;k<ls.length;k++)ls[k].onclick=function(){if(this.className.indexOf('done')>-1)return;
+   var a=card.querySelectorAll('.sel');for(var j=0;j<a.length;j++)a[j].className=a[j].className.replace(' sel','');
+   sel=this;this.className+=' sel'};
+  for(k=0;k<rs.length;k++)rs[k].onclick=function(){if(!sel||this.className.indexOf('done')>-1)return;
+   if(sel.getAttribute('data-l')==this.getAttribute('data-r')){sel.className=sel.className.replace(' sel','')+' done';this.className+=' done';sel=null;
+    if(card.querySelectorAll('.it.done').length==q.pairs.length)good()}else bad(this)}}
+}
+function drag(el){var g=$('ghost'),sx,sy,mv,on=false;
+ function pt(e){var t=e.touches&&e.touches[0]||e.changedTouches&&e.changedTouches[0]||e;return t}
+ function st(e){e.preventDefault();var t=pt(e);sx=t.clientX;sy=t.clientY;mv=false;on=true;g.textContent=el.textContent;g.style.display='block';pos(t)}
+ function pos(t){g.style.left=(t.clientX-30)+'px';g.style.top=(t.clientY-40)+'px'}
+ function mo(e){if(!on)return;var t=pt(e);if(Math.abs(t.clientX-sx)+Math.abs(t.clientY-sy)>8)mv=true;pos(t)}
+ function en(e){if(!on)return;on=false;var t=pt(e);g.style.display='none';
+  var s=$('slot');if(!s)return;var r=s.getBoundingClientRect();
+  var hit=t.clientX>r.left-30&&t.clientX<r.right+30&&t.clientY>r.top-30&&t.clientY<r.bottom+30;
+  if(!mv||hit)put(el.getAttribute('data-c'))}
+ el.addEventListener('touchstart',st,{passive:false});document.addEventListener('touchmove',mo,{passive:false});document.addEventListener('touchend',en);
+ el.addEventListener('mousedown',st);document.addEventListener('mousemove',mo);document.addEventListener('mouseup',en)}
+$('next').onclick=function(){if(i<15){i++;show()}};
+$('back').onclick=function(){if(i>0){i--;show()}};
+$('erase').onclick=function(){var s=$('slot');if(s){s.textContent='';s.className='slot'}};
+show();
+</script></body></html>
